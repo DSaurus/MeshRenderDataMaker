@@ -9,11 +9,16 @@
 
 class Mesh {
 public:
-    Mesh(std::string local_path);
+    Mesh(std::string local_path, int obj_type);
     Mesh(std::vector<glm::vec3> verts, std::vector<int> tris);
 
+    int obj_type = 0;
     void draw();
+    void mean();
 private:
     std::vector<glm::vec3> verts;
+    std::vector<glm::vec3> colors;
+    std::vector<glm::vec3> normals;
     std::vector<int> tris;
+    std::vector<int> trisn;
 };
