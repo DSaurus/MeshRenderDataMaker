@@ -7,6 +7,8 @@
 
 #include <glm/vec3.hpp>
 #include <glm/matrix.hpp>
+#include <glm/ext.hpp>
+#include <glm/gtx/string_cast.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -18,6 +20,24 @@ Mesh *display;
 void render(double current_time, GraphicsManager *gm) {
     /** Drawing Code Goes Here! **/
     glColor4f(0.7f, 0.8f, 0.8f, 1.0f);
+    glm::mat4 model(1.0f);
+    std::cout<<glm::to_string(model)<<std::endl;
+    model = glm::rotate(model, (float)glm::radians(-25.0f*current_time), glm::vec3(0, 1, 0));
+    std::cout<<glm::to_string(model)<<std::endl;
+
+    glm::mat4 view(1.0f);
+
+    view = glm::rotate(view, (float)glm::radians(90.0f), glm::vec3(1, 0, 0));
+    view = glm::translate(view, glm::vec3(0, -2.0f, -1.0f));
+
+    glm::mat4 projection = glm::perspective(glm::radians(90.0f), gm->aspect(), 0.1f, 40.0f);
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadMatrixf(glm::value_ptr(view*model));
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadMatrixf(glm::value_ptr(projection));
+    
     display->draw();
 }
 

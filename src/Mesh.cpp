@@ -30,7 +30,6 @@ Mesh::Mesh(std::string local_path) {
                 glm::vec3 v(x, y, z);
                 verts.push_back(v);
             }
-//			iss>>t>>t>>t;
         } else if(line.find("f ") == 0) {
             line = line.substr(2, std::string::npos);
             std::istringstream iss(line);
