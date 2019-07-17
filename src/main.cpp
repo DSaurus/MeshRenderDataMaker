@@ -3,6 +3,7 @@
 #include <functional>
 #include <iostream>
 
+#include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
 #include <glm/vec3.hpp>
@@ -76,11 +77,15 @@ void render(double current_time, GraphicsManager *gm) {
 
     glm::mat4 projection = glm::perspective(glm::radians(90.0f), gm->aspect(), 0.1f, 40.0f);
 
-    glMatrixMode(GL_MODELVIEW);
-    glLoadMatrixf(glm::value_ptr(view*model));
+    display->ourShader.setMat4("model", model);
+    display->ourShader.setMat4("view", view);
+    display->ourShader.setMat4("projection", projection);
 
-    glMatrixMode(GL_PROJECTION);
-    glLoadMatrixf(glm::value_ptr(projection));
+//    glMatrixMode(GL_MODELVIEW);
+//    glLoadMatrixf(glm::value_ptr(view*model));
+//
+//    glMatrixMode(GL_PROJECTION);
+//    glLoadMatrixf(glm::value_ptr(projection));
 
 
     glEnable(GL_DEPTH_TEST);
@@ -89,12 +94,16 @@ void render(double current_time, GraphicsManager *gm) {
 }
 
 int main(int argc, char **argv) {
-    std::string title = "OpenGL Tutorial";
+
+    std::string title = "Mesh Render";
     std::function<void(double, GraphicsManager*)> pass = &render;
+    GraphicsManager *gm = new GraphicsManager(title, pass);
+    gm->init();
+
     display = new Mesh("obj/human.obj", 1);
     display->readSkeleton();
     display->mean();
-    GraphicsManager *gm = new GraphicsManager(title, pass);
+    display->bindShader();
 
     gm->set_gl_version(2, 1); // Set OpenGL profile to 2.1
     gm->execute();

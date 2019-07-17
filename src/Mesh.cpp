@@ -1,3 +1,5 @@
+#include "Mesh.h"
+
 #include <sstream>
 #include <fstream>
 #include <algorithm>
@@ -7,7 +9,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/string_cast.hpp>
 
-#include "Mesh.h"
+#include "Shader.h"
+
 
 Mesh::Mesh(std::vector<glm::vec3> verts, std::vector<int> tris) : verts(verts), tris(tris) {}
 
@@ -134,7 +137,47 @@ void Mesh::readSkeleton() {
 
 }
 
+
+void Mesh::bindShader() {
+
+    float *vertex;
+    vertex = new float[tris.size()*6];
+    int sz = sizeof(float)*tris.size()*6;
+    int ind = 0;
+    if(obj_type == 1){
+        for(int i = 0; i < tris.size(); i += 3){
+            for(int j = 0; j < 3; j++){
+                int i1 = tris[i+j], j1 = trisn[i+j];
+                auto v1 = verts[i1-1];
+                auto c1 = colors[i1-1];
+                vertex[ind++] = v1.x; vertex[ind++] = v1.y; vertex[ind++] = v1.z;
+                vertex[ind++] = c1.x; vertex[ind++] = c1.y; vertex[ind++] = c1.z;
+            }
+        }
+    }
+
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sz, vertex, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), (void*) (3*sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    ourShader = Shader("shader/human.vs", "shader/human.fs");
+}
+
 void Mesh::draw() {
+
+    ourShader.use();
+    glBindVertexArray(VAO);
+    glDrawArrays(GL_TRIANGLES, 0, tris.size()*3);
+
+    return;
+
     glBegin(GL_TRIANGLES);
     if(obj_type == 0) {
         auto i = tris.begin();
@@ -190,13 +233,13 @@ void Mesh::draw() {
     }
     glEnd();
 
-    glPointSize(5);
-    glBegin(GL_POINTS);
-    for(int i = 0; i < skeletons.size(); i++){
-        glm::vec3 v = skeletons[i];
-        glColor4f(1.0, 0, 0, 1.0);
-        glVertex3f(v.x, v.y, v.z);
-    }
-    glEnd();
+//    glPointSize(5);
+//    glBegin(GL_POINTS);
+//    for(int i = 0; i < skeletons.size(); i++){
+//        glm::vec3 v = skeletons[i];
+//        glColor4f(1.0, 0, 0, 1.0);
+//        glVertex3f(v.x, v.y, v.z);
+//    }
+//    glEnd();
 
 }

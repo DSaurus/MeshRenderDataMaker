@@ -6,7 +6,8 @@ GraphicsManager::GraphicsManager(
 
 }
 
-bool GraphicsManager::execute() {
+bool GraphicsManager::init(){
+
     if(!glfwInit())
         return false;
 
@@ -20,8 +21,13 @@ bool GraphicsManager::execute() {
         glfwTerminate();
         return false;
     }
-
     glfwMakeContextCurrent(window);
+
+    glewExperimental = GL_TRUE;
+    glewInit();
+}
+
+bool GraphicsManager::execute() {
 
     while (!glfwWindowShouldClose(window))
     {

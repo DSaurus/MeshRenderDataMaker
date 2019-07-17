@@ -3,6 +3,7 @@
 #include <functional>
 #include <string>
 
+#include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm/vec3.hpp>
 #include <glm/gtc/quaternion.hpp>
@@ -14,6 +15,7 @@ class GraphicsManager {
 public:
     GraphicsManager(std::string title, std::function<void(double, GraphicsManager*)> render_fn);
     bool execute();
+    bool init();
 
     void set_gl_version(int major, int minor) {
         gl_major_version = major;
@@ -23,12 +25,12 @@ public:
     int width() { return 640; }
     int height() { return 480; }
     void set_clear_color(Color c) { clear_color = c; }
+    GLFWwindow *window;
 
 private:
     std::string title;
     std::function<void(double, GraphicsManager*)> render_fn;
 
-    GLFWwindow *window;
     int gl_major_version = 2;
     int gl_minor_version = 1;
 
