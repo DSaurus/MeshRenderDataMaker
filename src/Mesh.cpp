@@ -5,6 +5,7 @@
 
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 #include "Mesh.h"
 
@@ -87,6 +88,50 @@ void Mesh::mean(){
         v.y -= my;
         v.z -= mz;
     }
+    for(auto &v : skeletons){
+        v.x -= mx;
+        v.y -= my;
+        v.z -= mz;
+    }
+}
+
+void Mesh::readSkeleton() {
+    std::string filename = "obj/joints_coord.txt";
+    std::ifstream fin(filename);
+    std::string header;
+
+    //header
+    fin>>header;
+    std::cout<<header<<std::endl;
+    skeletons.resize(26);
+    for(int i = 0; i < 26; i++){
+        double x; fin>>x;
+        skeletons[i].x = x;
+    }
+    for(int i = 0; i < 26; i++){
+        double x; fin>>x;
+        skeletons[i].y = x;
+    }
+    for(int i = 0; i < 26; i++){
+        double x; fin>>x;
+        skeletons[i].z = x;
+    }
+
+    return;
+
+    fin>>header>>header;
+    std::cout<<header<<std::endl;
+
+    for(int i = 0; i < 21; i++){
+        double x, y, z;
+
+        fin>>x>>y>>z;
+        glm::vec3 v(x, y, z);
+        std::cout<<x<<" "<<y<<" "<<z<<std::endl;
+        skeletons.push_back(v);
+    }
+    exit(0);
+
 }
 
 void Mesh::draw() {
@@ -128,18 +173,30 @@ void Mesh::draw() {
             glm::vec3 n2 = normals[j2-1];
             glm::vec3 n3 = normals[j3-1];
 
-            glColor3f(c1.x, c1.y, c1.z);
+            float alpha = 0.5;
+
+            glColor4f(c1.x, c1.y, c1.z, alpha);
             glNormal3f(n1.x, n1.y, n1.z);
             glVertex3f(v1.x, v1.y, v1.z);
 
-            glColor3f(c2.x, c2.y, c2.z);
+            glColor4f(c2.x, c2.y, c2.z, alpha);
             glNormal3f(n2.x, n2.y, n2.z);
             glVertex3f(v2.x, v2.y, v2.z);
 
-            glColor3f(c3.x, c3.y, c3.z);
+            glColor4f(c3.x, c3.y, c3.z, alpha);
             glNormal3f(n3.x, n3.y, n3.z);
             glVertex3f(v3.x, v3.y, v3.z);
         }
     }
     glEnd();
+
+    glPointSize(5);
+    glBegin(GL_POINTS);
+    for(int i = 0; i < skeletons.size(); i++){
+        glm::vec3 v = skeletons[i];
+        glColor4f(1.0, 0, 0, 1.0);
+        glVertex3f(v.x, v.y, v.z);
+    }
+    glEnd();
+
 }
